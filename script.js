@@ -1,8 +1,9 @@
 /**TODO
  * --- JAVASCRIPT ---
  * 1. Make Poo Bounching and Moving
- * 2. Create Another Poo (Enemy Poo) / Can't be eaten
- * 3. Add feature: jika poo dimakan, enemy bertambah, jika semua poo telah dimakan akan ada lubang hitam tanda selesai
+ * 2. Make gameover state
+ * 3. Create Another Poo (Enemy Poo) / Can't be eaten
+ * 4. Add feature: jika poo dimakan, enemy bertambah, jika semua poo telah dimakan akan ada lubang hitam tanda selesai
  * 4. Add level: More Poo More Enemy More Faster
  * ---HTML & CSS---
  * 1. Add start game and exit game button
@@ -41,6 +42,8 @@ function keyPush(event){
             vx = 0;
             vy = 1;
             break;
+        case 13:
+            gameStart = true;
     }
 }
 
@@ -51,6 +54,15 @@ function drawPlayer(px, py, pW, pH){
 function drawPoo(poo0X, poo0Y, poo0W, poo0H){
     c.fillStyle = "green";
     c.fillRect(poo0X, poo0Y, poo0W, poo0H);
+}
+
+function drawGameOver(){
+    c.fillStyle = "yellow"
+    c.fillRect(10, 10, 580, 380)
+}
+function drawStartingGame(){
+    c.fillStyle = "Pink"
+    c.fillRect(10, 10, 580, 380)
 }
 
 function playerNpooCollision(px, py, pW, pH, poo0X, poo0Y, poo0W, poo0H) {
@@ -75,13 +87,8 @@ let vy = 0;
 
 //Poo
 let pooObj = {
-    livingPoo: [{
-        x: Math.floor((Math.random() * 1000) % 550),
-        y: Math.floor((Math.random() * 1000) % 350),
-        height: 20,
-        width: 20,
-        termakan: false
-    }],  
+    livingPoo: [],
+    isAllEaten: 0  
 }
 
 let allPoos = 5
@@ -90,6 +97,8 @@ for(let i = 0; i < allPoos; i++){
     pooObj.livingPoo.push({
         x: Math.floor((Math.random() * 1000) % 550),
         y: Math.floor((Math.random() * 1000) % 350),
+        vx: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
+        vy: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
         height: 20,
         width: 20,
         termakan: false
@@ -100,15 +109,17 @@ let numberPoo = pooObj.livingPoo.length;
 
 
 //Game variable
+let gameStart = false;
 let gameOver = false;
-
-
 //gameUpdate
 function game() {
     c.fillStyle = "black";
     c.fillRect(0,0, canv.width, canv.height);
 
-    if(!gameOver){
+    if(gameStart){
+        //Player Logic & Draw
+        drawPlayer(px,py, pW,pH);
+        //Player Move 
         px += vx;
         py += vy;
         //Player inside screen
@@ -124,20 +135,51 @@ function game() {
         if(py > gameHeight - 1){
             py = -15;
         }
-        
-        //Drawing
-        drawPlayer(px,py, pW,pH);
 
+        //Poo Logic & Draw
+        pooObj.isAllEaten = 0;
         for(let i = 0; i < numberPoo; i++){
+            let pooX = pooObj.livingPoo[i].x;
+            let pooY = pooObj.livingPoo[i].y;
+            let pooH = pooObj.livingPoo[i].height;
+            let pooW = pooObj.livingPoo[i].width;
+            
+            //From Here To... 
+            pooObj.livingPoo[i].x += pooObj.livingPoo[i].vx;
+            pooObj.livingPoo[i].y += pooObj.livingPoo[i].vy;
+
+            if(pooObj.livingPoo[i].x > gameWidth - 20
+                || pooObj.livingPoo[i].x < 0){
+                pooObj.livingPoo[i].vx *= -1;
+            }
+            if(pooObj.livingPoo[i].y > gameHeight - 15 || pooObj.livingPoo[i].y < 0){
+                pooObj.livingPoo[i].vy *= -1;
+            }
+            //Here: Move & Bounce Poo
+
+            //From Here To...
             if(!pooObj.livingPoo[i].termakan){
                 drawPoo(pooObj.livingPoo[i].x, pooObj.livingPoo[i].y, pooObj.livingPoo[i].width, pooObj.livingPoo[i].height)
-                
-                pooObj.livingPoo[i].termakan = playerNpooCollision(px, py, pW, pH, pooObj.livingPoo[i].x, pooObj.livingPoo[i].y, pooObj.livingPoo[i].width, pooObj.livingPoo[i].height)
-            }
-        }
-           
-    } else {
 
+                pooObj.livingPoo[i].termakan = playerNpooCollision(px, py, pW, pH, pooX, pooY, pooW, pooH)
+            } else {
+                pooObj.isAllEaten++
+            }
+            //Here: drawing poo & check is all eaten
+        }
+
+        //Game Victory Check
+        if(pooObj.isAllEaten === numberPoo){
+            gameStart = false;
+            gameOver = true;
+        }
+
+    } else {
+        if(gameOver){
+            drawGameOver();
+        } else {
+            drawStartingGame();
+        }
     }
     
 }
