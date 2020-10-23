@@ -220,8 +220,12 @@ function game() {
             gameWin = true;
         }
         if(countScore === 0){
+            gameStart = false;
+            gameTrue = true;
             gameLose = true;
+            score.innerHTML = `You Lose!`
         }
+
         if(gameLose){
             score.innerHTML = `You Lose!`
         } else {
