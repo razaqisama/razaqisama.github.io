@@ -1,25 +1,9 @@
-/**TODO
- * --- JAVASCRIPT ---
- * 1. Make Poo Bounching and Moving (Done)
- * 2. Make gameover state (Done)
- * 3. Create Another Poo (Enemy Poo) / Can't be eaten
- * 4. Add feature: jika poo dimakan, enemy bertambah, jika semua poo telah dimakan akan ada lubang hitam tanda selesai
- * 5. Add level: More Poo More Enemy More Faster
- * ---HTML & CSS---
- * 1. Add start game and exit game button
- * 2. Add How to play
- * 3. Add score  
- */
-
-
 window.onload = function () {
     canv = document.getElementById("canvasGame")
     c = canv.getContext("2d");
     document.addEventListener("keydown", keyPush);
-    setInterval(game, 1000/150);
-    
+    setInterval(game, 1000/100);
 }
-
 //Fungsi untuk gerak player dan prevent windows scrolling; 
 function keyPush(event){
     if([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
@@ -72,47 +56,6 @@ function playerNpooCollision(px, py, pW, pH, poo0X, poo0Y, poo0W, poo0H) {
     }
 }
 
-
-//Inisialisasi Awal
-const gameWidth = 600;
-const gameHeight = 400;
-
-//player
-let px = 10;
-let py = 10;
-let pW = 20;
-let pH = 20;
-let vx = 0;
-let vy = 0;
-
-//Poo
-let pooObj = {
-    livingPoo: [],
-    isAllEaten: 0  
-}
-
-let allPoos = 5
-
-for(let i = 0; i < allPoos; i++){
-    pooObj.livingPoo.push({
-        x: Math.floor((Math.random() * 1000) % 550),
-        y: Math.floor((Math.random() * 1000) % 350),
-        vx: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
-        vy: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
-        height: 20,
-        width: 20,
-        termakan: false
-    })
-}
-
-let numberPoo = pooObj.livingPoo.length;
-
-
-//Game variable
-let gameStart = false;
-let gameOver = false;
-
-
 //gameUpdate
 function game() {
     c.fillStyle = "black";
@@ -137,7 +80,7 @@ function game() {
         if(py > gameHeight - 1){
             py = -15;
         }
-
+        countScore--
         //Poo Logic & Draw
         pooObj.isAllEaten = 0;
         for(let i = 0; i < numberPoo; i++){
@@ -175,14 +118,60 @@ function game() {
             gameStart = false;
             gameOver = true;
         }
-
+        score.innerHTML = `Score: ${countScore}`
     } else {
         if(gameOver){
             drawGameOver();
         } else {
             drawStartingGame();
+            score.innerHTML = `Score: 0`
         }
     }
-    
+    let level0 = document.getElementById("level0");
+      level0.addEventListener("click", () => {
+        game();
+      });
 }
+
+
+//Inisialisasi Awal
+const gameWidth = 600;
+const gameHeight = 400;
+
+//player
+let px = 10;
+let py = 10;
+let pW = 20;
+let pH = 20;
+let vx = 0;
+let vy = 0;
+
+//Poo
+let pooObj = {
+    livingPoo: [],
+    isAllEaten: 0  
+}
+
+let allPoos = 5
+
+for(let i = 0; i < allPoos; i++){
+    pooObj.livingPoo.push({
+        x: Math.floor((Math.random() * 1000) % 550),
+        y: Math.floor((Math.random() * 1000) % 350),
+        vx: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
+        vy: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
+        height: 20,
+        width: 20,
+        termakan: false
+    })
+}
+
+let numberPoo = pooObj.livingPoo.length;
+
+//Game variable
+let gameStart = false;
+let gameOver = false;
+let countScore = 10000;
+let score = document.getElementById("score");
+
 
