@@ -1,10 +1,10 @@
 /**TODO
  * --- JAVASCRIPT ---
- * 1. Make Poo Bounching and Moving
- * 2. Make gameover state
+ * 1. Make Poo Bounching and Moving (Done)
+ * 2. Make gameover state (Done)
  * 3. Create Another Poo (Enemy Poo) / Can't be eaten
  * 4. Add feature: jika poo dimakan, enemy bertambah, jika semua poo telah dimakan akan ada lubang hitam tanda selesai
- * 4. Add level: More Poo More Enemy More Faster
+ * 5. Add level: More Poo More Enemy More Faster
  * ---HTML & CSS---
  * 1. Add start game and exit game button
  * 2. Add How to play
@@ -111,6 +111,8 @@ let numberPoo = pooObj.livingPoo.length;
 //Game variable
 let gameStart = false;
 let gameOver = false;
+
+
 //gameUpdate
 function game() {
     c.fillStyle = "black";
