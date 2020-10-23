@@ -23,7 +23,7 @@ let pooObj = {
     livingEnemy: [],
     isAllEaten: 0  
 }
-let allEnemies = 12;
+let allEnemies = 9;
 let allPoos = 7;
 
 
