@@ -2,8 +2,74 @@ window.onload = function () {
     canv = document.getElementById("canvasGame")
     c = canv.getContext("2d");
     document.addEventListener("keydown", keyPush);
-    setInterval(game, 1000/100);
+    intervalSet();
 }
+
+//Inisialisasi Awal
+const gameWidth = 600;
+const gameHeight = 400;
+
+//player
+let px = 10;
+let py = 10;
+let pW = 20;
+let pH = 20;
+let vx = 0;
+let vy = 0;
+
+//Poo
+let pooObj = {
+    livingPoo: [],
+    livingEnemy: [],
+    isAllEaten: 0  
+}
+let allEnemies = 12;
+let allPoos = 7;
+
+
+for(let i = 0; i < allPoos; i++){
+    pooObj.livingPoo.push({
+        x: Math.floor((Math.random() * 1000) % 550),
+        y: Math.floor((Math.random() * 1000) % 350),
+        vx: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
+        vy: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
+        height: 20,
+        width: 20,
+        termakan: false
+    })
+}
+for(let i = 0; i < allEnemies; i++){
+    pooObj.livingEnemy.push({
+        x: Math.floor(((Math.random() * 1000) % 550 + 50)),
+        y: Math.floor(((Math.random() * 1000) % 350) + 50),
+        vx: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
+        vy: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
+        height: 20,
+        width: 20,
+        termakan: false
+    })
+}
+
+
+let numberPoo = pooObj.livingPoo.length;
+let numberEnemies = pooObj.livingEnemy.length;
+
+//Game variable
+let gameStart = false;
+let gameOver = false;
+let countScore = 5000;
+let score = document.getElementById("score");
+let gameLose = false;
+let gameWin = false;
+function intervalSet(){
+    return setInterval(game, 1000/150);
+}
+
+
+function myStopFunction() {
+    clearInterval(intervalSet());
+}
+
 //Fungsi untuk gerak player dan prevent windows scrolling; 
 function keyPush(event){
     if([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1) {
@@ -32,7 +98,7 @@ function keyPush(event){
 }
 
 function drawPlayer(px, py, pW, pH){
-    c.fillStyle = "red";
+    c.fillStyle = "white";
     c.fillRect(px, py, pW, pH);
 }
 function drawPoo(poo0X, poo0Y, poo0W, poo0H){
@@ -40,12 +106,13 @@ function drawPoo(poo0X, poo0Y, poo0W, poo0H){
     c.fillRect(poo0X, poo0Y, poo0W, poo0H);
 }
 
-function drawGameOver(){
-    c.fillStyle = "yellow"
-    c.fillRect(10, 10, 580, 380)
+function drawEnemy(poo0X, poo0Y, poo0W, poo0H){
+    c.fillStyle = "red"
+    c.fillRect(poo0X, poo0Y, poo0W, poo0H);
 }
-function drawStartingGame(){
-    c.fillStyle = "Pink"
+
+function drawGameState(){
+    c.fillStyle = "#dc7633"
     c.fillRect(10, 10, 580, 380)
 }
 
@@ -60,7 +127,7 @@ function playerNpooCollision(px, py, pW, pH, poo0X, poo0Y, poo0W, poo0H) {
 function game() {
     c.fillStyle = "black";
     c.fillRect(0,0, canv.width, canv.height);
-
+    
     if(gameStart){
         //Player Logic & Draw
         drawPlayer(px,py, pW,pH);
@@ -112,66 +179,65 @@ function game() {
             }
             //Here: drawing poo & check is all eaten
         }
+        //Enemy Logic
+        for(let i = 0; i < numberEnemies; i++){
+            let pooX = pooObj.livingEnemy[i].x;
+            let pooY = pooObj.livingEnemy[i].y;
+            let pooH = pooObj.livingEnemy[i].height;
+            let pooW = pooObj.livingEnemy[i].width;
+            
+            //From Here To... 
+            pooObj.livingEnemy[i].x += pooObj.livingEnemy[i].vx;
+            pooObj.livingEnemy[i].y += pooObj.livingEnemy[i].vy;
+
+            if(pooObj.livingEnemy[i].x > gameWidth - 20
+                || pooObj.livingEnemy[i].x < 0){
+                pooObj.livingEnemy[i].vx *= -1;
+            }
+            if(pooObj.livingEnemy[i].y > gameHeight - 15 || pooObj.livingEnemy[i].y < 0){
+                pooObj.livingEnemy[i].vy *= -1;
+            }
+            //Here: Move & Bounce Enemy
+
+            //From Here To...
+            if(!pooObj.livingEnemy[i].termakan){
+                drawEnemy(pooObj.livingEnemy[i].x, pooObj.livingEnemy[i].y, pooObj.livingEnemy[i].width, pooObj.livingEnemy[i].height)
+
+                pooObj.livingEnemy[i].termakan = playerNpooCollision(px, py, pW, pH, pooX, pooY, pooW, pooH)
+            } else {
+                gameStart = false;
+                gameOver = true;
+                gameLose = true;
+            }
+            //Here: drawing Enemy & check is eaten
+        }
 
         //Game Victory Check
+        
         if(pooObj.isAllEaten === numberPoo){
             gameStart = false;
             gameOver = true;
+            gameWin = true;
         }
-        score.innerHTML = `Score: ${countScore}`
+        if(countScore === 0){
+            gameLose = true;
+        }
+        if(gameLose){
+            score.innerHTML = `You Lose!`
+        } else {
+            if(gameWin){
+                score.innerHTML = `You win! your score: ${countScore}`
+            } else {
+                score.innerHTML = `Score: ${countScore}`
+            }
+        }
     } else {
         if(gameOver){
-            drawGameOver();
+            drawGameState()
+            myStopFunction();
         } else {
-            drawStartingGame();
+            drawGameState()
             score.innerHTML = `Score: 0`
         }
     }
-    let level0 = document.getElementById("level0");
-      level0.addEventListener("click", () => {
-        game();
-      });
 }
-
-
-//Inisialisasi Awal
-const gameWidth = 600;
-const gameHeight = 400;
-
-//player
-let px = 10;
-let py = 10;
-let pW = 20;
-let pH = 20;
-let vx = 0;
-let vy = 0;
-
-//Poo
-let pooObj = {
-    livingPoo: [],
-    isAllEaten: 0  
-}
-
-let allPoos = 5
-
-for(let i = 0; i < allPoos; i++){
-    pooObj.livingPoo.push({
-        x: Math.floor((Math.random() * 1000) % 550),
-        y: Math.floor((Math.random() * 1000) % 350),
-        vx: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
-        vy: Math.round(Math.random()) * Math.round(Math.random()) ? 1 : -1,
-        height: 20,
-        width: 20,
-        termakan: false
-    })
-}
-
-let numberPoo = pooObj.livingPoo.length;
-
-//Game variable
-let gameStart = false;
-let gameOver = false;
-let countScore = 10000;
-let score = document.getElementById("score");
-
-
