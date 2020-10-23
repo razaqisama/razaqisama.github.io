@@ -9,6 +9,6 @@ Buat Final Project Phase 0
  * 5. Add level: More Poo More Enemy More Faster
  * ---HTML & CSS---
  * 1. Add new game button (Done)
- * 2. Add How to play (Changed. Learn it by playing the game please XD )
+ * 2. Add How to play (Done)
  * 3. Add score (Done) 
  */
