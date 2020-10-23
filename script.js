@@ -23,7 +23,7 @@ let pooObj = {
     livingEnemy: [],
     isAllEaten: 0  
 }
-let allEnemies = 9;
+let allEnemies = 8;
 let allPoos = 7;
 
 
@@ -237,7 +237,7 @@ function game() {
             myStopFunction();
         } else {
             drawGameState()
-            score.innerHTML = `Score: 0`
+            score.innerHTML = `Score Here`
         }
     }
 }
