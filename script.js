@@ -219,9 +219,9 @@ function game() {
             gameOver = true;
             gameWin = true;
         }
-        if(countScore === 0){
+        if(countScore < 0){
             gameStart = false;
-            gameTrue = true;
+            gameOver = true;
             gameLose = true;
             score.innerHTML = `You Lose!`
         }
